@@ -103,5 +103,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-*.txt
+/fetch_page/*/*.txt
+*gh*.txt
+*lever*.txt
 *.htm

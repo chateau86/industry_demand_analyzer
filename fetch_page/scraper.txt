@@ -1,0 +1,2 @@
+scrapy crawl SearchEngineScrapy -a searchEngine="google" -a searchQuery="software engineer intern site:lever.co inurl:apply" -a pages=10 -o result_lever.csv
+scrapy crawl SearchEngineScrapy -a searchEngine="google" -a searchQuery="software engineer intern site:greenhouse.io inurl:jobs" -a pages=10 -o result_gh.csv
