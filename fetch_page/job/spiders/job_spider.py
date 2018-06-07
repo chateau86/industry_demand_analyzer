@@ -8,7 +8,6 @@ GH_CPNY_REGEX = re.compile(r"greenhouse.io\/(?P<company>.*)\/jobs\/(?P<pos>\d*)"
 from html.parser import HTMLParser
 import html.entities
 
-#  https://stackoverflow.com/questions/753052/strip-html-from-strings-in-python
 class HTMLTextExtractor(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
@@ -26,25 +25,35 @@ class HTMLTextExtractor(HTMLParser):
         self.result.append(unichr(codepoint))
 
     def get_text(self):
-        return u' '.join(self.result)
+        return u''.join(self.result)
 
 def html_to_text(html):
     s = HTMLTextExtractor()
     s.feed(html)
     return s.get_text()
 
-
-class LeverJobSpider(scrapy.Spider):
-    name = "lever_job"
-
+class JobSpider(scrapy.Spider):
+    name = "job"
+    def __init__(self):
+        super()
+        self.cpny_regex = None
+        self.out_fname = "cpny/cpny_{:}_{:}.txt"
+        self.in_fname = "result_cpny_clean.txt"
+        self.body_xpath = "//"
+    
     def start_requests(self):
-        f_in = open('result_lever_clean.txt','r')
+        f_in = open(self.in_fname,'r')
+        #urls = [
+        #    'https://boards.greenhouse.io/khanacademy/jobs/15827',
+        #]
+        #for url in urls:
+        #    yield scrapy.Request(url=url, callback=self.parse)
         for line in f_in:
             if line.strip() != "":
                 yield scrapy.Request(url=line.strip(), callback=self.parse)
 
     def parse(self, response):
-        url_split = LEVER_CPNY_REGEX.search(response.url)
+        url_split = self.cpny_regex.search(response.url)
         if url_split is None:
             self.log('----Error at {:}'.format(response.url))
             return
@@ -55,12 +64,11 @@ class LeverJobSpider(scrapy.Spider):
         #with open(filename, 'wb') as f:
         #    f.write(response.body) #  change this to just body text
             
-        filename = 'lever_pages/lever_{:}_{:}.txt'.format(cpny, pos)
+        filename = self.out_fname.format(cpny, pos)
         with open(filename, 'w') as f:
-            txt_response = response.xpath('//html/body/div[2]/div/div[2]').extract_first()
+            txt_response = response.xpath(self.body_xpath).extract_first()
             txt_response = re.sub(r'&nbsp;', ' ', txt_response)
             txt_response = html_to_text(txt_response)
-            txt_response = re.sub(r'[.,:;] ', ' ', txt_response)
-            txt_response = re.sub(r'[()/\"\\]', ' ', txt_response)
+            txt_response = re.sub(r'[.,:;()/\"\\]', ' ', txt_response)
             f.write(txt_response) #  change this to just body text
         self.log('Saved file %s' % filename)
