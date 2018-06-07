@@ -4,6 +4,7 @@ import re
 
 LEVER_CPNY_REGEX = re.compile(r"lever\.co\/(?P<company>.*)\/(?P<pos>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})")
 GH_CPNY_REGEX = re.compile(r"greenhouse.io\/(?P<company>.*)\/jobs\/(?P<pos>\d*)")
+SR_CPNY_REGEX = re.compile(r"smartrecruiters\.com\/(?P<company>.*)\/(?P<pos>[^?\n]*)")
 
 from html.parser import HTMLParser
 import html.entities
@@ -28,4 +29,11 @@ class LeverJobSpider(job.spiders.job_spider.JobSpider):
         self.in_fname = "result_lever_clean.txt"
         self.body_xpath = '//html/body/div[2]/div/div[2]'
         
-        
+class SRJobSpider(job.spiders.job_spider.JobSpider):
+    name = "sr_job"
+    def __init__(self):
+        super()
+        self.cpny_regex = SR_CPNY_REGEX
+        self.out_fname = "sr_pages/sr_{:}_{:}.txt"
+        self.in_fname = "result_sr_clean.txt"
+        self.body_xpath = "//div[contains(@class, 'job-sections')]"

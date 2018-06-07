@@ -25,7 +25,7 @@ class HTMLTextExtractor(HTMLParser):
         self.result.append(unichr(codepoint))
 
     def get_text(self):
-        return u''.join(self.result)
+        return u' '.join(self.result)
 
 def html_to_text(html):
     s = HTMLTextExtractor()
